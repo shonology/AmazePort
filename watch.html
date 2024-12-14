@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro TV Video Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #4b3621; /* Retro brown background */
+            color: #f5deb3; /* Light beige text */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .tv-frame {
+            position: relative;
+            width: 500px;
+            height: 400px;
+            background: #3b2d1f; /* Darker brown for the TV */
+            border: 10px solid #8b4513; /* Wood-like frame */
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .tv-frame::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.2));
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .tv-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 1;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .tv-controls {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .tv-controls button {
+            width: 40px;
+            height: 40px;
+            background-color: #8b4513; /* Matching wood tone */
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .tv-controls button:hover {
+            background-color: #a0522d; /* Slightly lighter tone */
+        }
+  
+    </style>
+</head>
+<body>
+    
+    <div class="tv-frame">
+        <div class="tv-screen">
+            <iframe
+                src="ytb.mp4"
+                title=" video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="tv-controls">
+            <button onclick="alert('Volume Up!')">+</button>
+            <button onclick="alert('Volume Down!')">-</button>
+            <button onclick="alert('Turn Off TV!')">&#x26AB;</button>
+        </div>
+    </div>
+</body>
+</html>

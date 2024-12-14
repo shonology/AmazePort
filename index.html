@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Lamp Webpage with Sudoku</title>
+    <style>
+        body {
+    font-family: 'Times New Roman', serif;
+    background: url('as.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    color: #2e2e2e;
+    margin: 0;
+    padding: 0;
+    transition: filter 1s ease-in-out;
+    cursor: url('pen.jpg'), auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+header h1 {
+    font-size: 3.5rem;
+    letter-spacing: 2px;
+    color: #f8f8f8;
+    text-shadow: 2px 2px 5px #000;
+    transition: color 1s ease-in-out;
+}
+
+.headline {
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 4px #000;
+    margin: 20px 0;
+    transition: color 1s ease-in-out;
+}
+
+.body-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin: 20px 0;
+    color: #fff;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 1s ease-in-out, color 1s ease-in-out;
+}
+
+.blank-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 500%;
+    height: 500%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2;
+    transition: opacity 1s ease-in-out;
+    pointer-events: none;
+}
+
+.lamp-button {
+    display: inline-block;
+    margin: 20px;
+    padding: 20px 30px;
+    font-size: 1.2rem;
+    color: #fff;
+    background-color: #8b4513;
+    border: 2px solid #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 3;
+    position: fixed; /* Changed from relative to fixed */
+    bottom: 20px; /* Positioned at the bottom */
+    left: 50%; /* Centered horizontally */
+    transform: translateX(-50%); /* Centered horizontally */
+}
+
+.lamp-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+}
+
+.visible {
+    visibility: visible;
+    opacity: 1;
+    color: #2e2e2e;
+}
+
+.hidden-overlay {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Sudoku styles */
+.sudoku-container {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 5px;
+    margin-top: 30px;
+    position: relative; /* Changed from fixed to relative */
+    top: 1000px; /* Moved downwards to be visible upon scrolling */
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.sudoku-cell {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.5rem;
+    border: 1px solid #333;
+    background-color: #f5f5f5;
+}
+
+.sudoku-cell input {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    border: none;
+    background-color: transparent;
+    font-size: 1.5rem;
+}
+
+/* Analog Clock Styles */
+#clock {
+    width: 200px;
+    height: 200px;
+    border: 8px solid #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#clock .hour, #clock .minute, #clock .second {
+    position: absolute;
+    background-color: #000;
+    border-radius: 50%;
+}
+
+#clock .hour {
+    width: 6px;
+    height: 50px;
+    top: 25%;
+    left: 50%;
+    transform-origin: 50% 100%;
+    transition: transform 0.5s ease;
+}
+
+#clock .minute {
+    width: 4px;
+    height: 70px;
+    top: 15%;
+    left: 50%;
+    transform-origin: 50% 100%;
+    transition: transform 0.5s ease;
+}
+
+#clock .second {
+    width: 2px;
+    height: 80px;
+    top: 10%;
+    left: 50%;
+    transform-origin: 50% 100%;
+    background-color: red;
+    transition: transform 0.5s ease;
+}
+
+#clock .numbers {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+    height: 90%;
+    justify-content: center;
+    align-items: center;
+}
+
+#clock .numbers div {
+    position: absolute;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#clock .numbers .one { transform: rotate(30deg) translateY(-75px); }
+#clock .numbers .two { transform: rotate(60deg) translateY(-75px); }
+#clock .numbers .three { transform: rotate(90deg) translateY(-75px); }
+#clock .numbers .four { transform: rotate(120deg) translateY(-75px); }
+#clock .numbers .five { transform: rotate(150deg) translateY(-75px); }
+#clock .numbers .six { transform: rotate(180deg) translateY(-75px); }
+#clock .numbers .seven { transform: rotate(210deg) translateY(-75px); }
+#clock .numbers .eight { transform: rotate(240deg) translateY(-75px); }
+#clock .numbers .nine { transform: rotate(270deg) translateY(-75px); }
+#clock .numbers .ten { transform: rotate(300deg) translateY(-75px); }
+#clock .numbers .eleven { transform: rotate(330deg) translateY(-75px); }
+#clock .numbers .twelve { transform: rotate(360deg) translateY(-75px); }
+
+.section-button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #8b4513;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.section-button:hover {
+    background-color: #a0522d;
+}
+
+.section-content {
+    display: none;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+form label {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+form input, form textarea, form button {
+    margin-top: 5px;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    background-color: #8b4513;
+    color: white;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #a0522d;
+}
+
+
+#termsModal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+#termsModal.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#termsModal .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 70%;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#termsModal .modal-content h2 {
+    font-size: 2rem;
+}
+
+#termsModal .modal-content p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+}
+
+#termsModal .modal-content .agree-button {
+    padding: 10px 20px;
+    background-color: #8b4513;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+#termsModal .modal-content .agree-button:hover {
+    background-color: #a0522d;
+}
+
+/* Loading animation */
+#loadingAnimation {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9998;
+}
+
+#loadingAnimation.visible {
+    display: block;
+}
+
+#loadingAnimation .spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* SVG Signature Animation */
+#signature {
+    width: 100%;
+    height: auto;
+    display: none; /* Initially hidden */
+}
+
+#signature path {
+    fill: none;
+    stroke: #000;
+    stroke-width: 2;
+    stroke-dasharray: 1000; /* The total length of the path */
+    stroke-dashoffset: 1000; /* Initially hide the path */
+    transition: stroke-dashoffset 2s ease; /* Animate path drawing */
+}
+
+#signature.visible path {
+    stroke-dashoffset: 0; /* Reveal the path */
+}
+
+//* General styles for sections */
+.section-content {
+    font-family: 'Brush Script MT', cursive, sans-serif;  /* Handwriting-style font for retro look */
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1.2rem; /* Adjust font size if needed */
+    line-height: 1.6;
+    color: #3b2e2a;  /* Warm brownish color, common in retro designs */
+    background: #f0e4d7; /* Creamy retro paper background */
+    padding: 15px;
+    border-radius: 10px; /* Slightly rounded corners for a retro feel */
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+}
+
+/* Style for the animated text effect */
+.section-content h2, .section-content p {
+    display: inline-block;
+    opacity: 0;
+    animation: typing 4s steps(40) forwards, blink 0.75s step-end infinite;
+    letter-spacing: 1px;  /* Slight space between letters for a smoother look */
+    font-style: italic;  /* Handwritten feel */
+    color: #2f1a18; /* Dark brown text to complement the retro paper background */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);  /* Light shadow for vintage effect */
+}
+
+/* Animation for typing effect */
+@keyframes typing {
+    from {
+        width: 0;
+        opacity: 1;
+    }
+    to {
+        width: 100%;
+        opacity: 1;
+    }
+}
+
+/* Blink effect for cursor (optional) */
+@keyframes blink {
+    50% {
+        border-color: transparent;
+    }
+}
+
+/* Adjust duration for headers and paragraphs */
+.section-content h2 {
+    animation-duration: 6s; /* Adjust duration for headings */
+}
+
+.section-content p {
+    animation-duration: 8s; /* Adjust duration for paragraphs */
+}
+
+/* Optional: Cursor-like effect after the text appears */
+.section-content h2::after, .section-content p::after {
+    content: '|';
+    display: inline-block;
+    margin-left: 5px;
+    animation: blink 0.75s step-end infinite;
+}
+
+/* Retro button styles */
+button.agree-button {
+    background-color: #d66f39; /* Vintage burnt orange button */
+    color: white;
+    border: none;
+    border-radius: 12px; /* Rounded corners for retro effect */
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2); /* Button shadow */
+}
+
+/* Button hover effect */
+button.agree-button:hover {
+    background-color: #a6582c;  /* Darker burnt orange on hover */
+}
+
+.radio-player {
+            background: linear-gradient(to bottom, #d49a6a, #b27d52); /* Retro wood-grain gradient */
+            color: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            display: inline-block;
+            width: 320px;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+            border: 5px solid #b27d52; /* Matches wood tones */
+        }
+
+        .radio-player h1 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #ffdd8e; /* Golden retro text */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .controls button {
+            background-color: #6d4c41; /* Deep retro brown */
+            color: #ffdd8e; /* Golden text for contrast */
+            border: none;
+            padding: 12px 25px;
+            margin: 5px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .controls button:hover {
+            background-color: #5d4037; /* Slightly darker brown */
+            transform: scale(1.1);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .track-info {
+            margin-top: 15px;
+            font-size: 14px;
+            font-style: italic;
+            color: #fcebb6; /* Light retro cream */
+        }
+
+        /* Audio player hidden but accessible */
+        audio {
+            display: none;
+        }
+
+        /* Retro speaker-like circles for decoration */
+        .speaker {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #4e342e 30%, #3e2723 90%);
+            border-radius: 50%;
+            margin: 10px auto;
+            box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .news-ticker {
+            background-color: #ffcc80; /* Light orange for retro feel */
+            color: #3e2723;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .news-ticker span {
+            display: inline-block;
+            animation: scroll 10s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes scroll {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        .open-gallery-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px; /* Changed to align the button to the right */
+  padding: 15px 25px;
+  background-color: #8b4513;
+  color: #fff;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s;
+}
+
+
+
+    .open-gallery-button:hover {
+      background-color: #a0522d;
+    }
+
+    /* Modal Styles */
+    .gallery-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+    }
+
+    .gallery-modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #faf0e6;
+      padding: 20px;
+      width: 80%;
+      max-width: 900px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+      max-height: 90%;
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #8b4513;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #8b4513;
+    }
+
+    .close-gallery {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #8b4513;
+      border: none;
+      background: none;
+      transition: color 0.3s;
+    }
+
+    .close-gallery:hover {
+      color: #a0522d;
+    }
+
+    .gallery-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .gallery-item {
+      width: 200px;
+      border: 5px solid #8b4513;
+      border-radius: 10px;
+      background-color: #fff;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery-item img,
+    .gallery-item video {
+      width: 100%;
+      display: block;
+    }
+
+    .gallery-item p {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      background-color: #fef6e4;
+      color: #8b4513;
+      padding: 10px;
+      margin: 0;
+      border-top: 2px solid #8b4513;
+    }
+    a {
+      text-decoration: none;
+      font-size: 1.5rem;
+      color: #fff;
+      background-color: #865b05;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    a:hover {
+      background-color: #0056b3;
+    }
+    
+    .cartoon-images img {
+    border: 2px solid #8b4513;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.cartoon-images img:hover {
+    transform: scale(1.1);
+}
+#splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #cdcaca;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #splash-screen h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        #splash-screen p {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        #splash-screen button,
+        #splash-screen a {
+            background-color: #8b4513;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        #splash-screen button:hover,
+        #splash-screen a:hover {
+            background-color: #8b4513;
+        }
+
+    </style>
+</head>
+<body>
+    <a href="gallery.html">See Collections</a>
+    <a href="watch.html">See Old Film</a>
+    <a href="snake.html">Play Game</a>
+
+    <div id="termsModal" class="terms-modal">
+        <div class="modal-content">
+            <h2>Terms and Conditions</h2>
+            <p>Please read and agree to the terms.</p>
+            
+            <!-- SVG signature -->
+            <div id="signature" class="signature">
+                <svg viewBox="0 0 500 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Replace the following path data with your actual signature's paths -->
+                    <path d="M10,80 C100,10 200,10 300,80" />
+                    <path d="M50,80 C150,30 250,30 350,80" />
+                    <path d="M90,80 C180,50 280,50 380,80" />
+                </svg>
+            </div>
+            
+            <button class="agree-button" onclick="agreeTerms()">Agree</button>
+        </div>
+    </div>
+    
+    <!-- Loading Animation -->
+    <div id="loadingAnimation">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="blank-overlay" id="overlay"></div>
+    
+
+    <div class="container">
+        <header>
+            <h1 id="title">Welcome to My Portfolio</h1>
+            <div class="headline" id="headline">Explore My Space</div>
+        </header>
+         <!-- Toggle Buttons for Sections -->
+        <button class="section-button" onclick="toggleSection('introduction'); playSound('introduction')">Introduction</button>
+        <button class="section-button" onclick="toggleSection('projects'); playSound('projects')">Projects</button>
+        <button class="section-button" onclick="toggleSection('achievements'); playSound('achievements')">Achievements</button>
+        <button class="section-button" onclick="toggleSection('contact'); playSound('contact')">Contact</button>
+        <button class="section-button" onclick="toggleSection('About'); playSound('introduction')">About</button>
+        
+         <!-- Section Contents -->
+        <div id="introduction" class="section-content">
+            <h2>Introduction</h2>
+            <form>
+            <p>I am a highly motivated individual with a strong passion for technology and software development.</p> 
+            <p>Over the years, I have honed my skills in coding, problem-solving, and project management. My interests lie in areas such as artificial intelligence, cybersecurity, and innovative application development. 
+            <p>With a keen eye for detail and a proactive attitude, I aim to leverage my skills to create impactful solutions in the tech industry..</p>
+            </form>
+        </div>
+        <div id="About" class="section-content">
+            <h2>About</h2>
+            <form>
+            <p>The website crafted by Shoun</p>
+            <p>Technologies used are HTML, CSS JS, Python</p>
+            <p>Features of the website ->Radio Music Player, Analogue clock,Sudoku Game, Snake Game and website all retro newspaper themed.</p>
+            <p>It has sound effects when clicking buttons and turn on light which lightnes or darkens the webpage</p>
+            <p>Using Computer Vision users can also control without the need of mouse so to bring the concept of "Contacless Surfing!!" using hand gestures</p>
+            <p>Run the python script as per the instructions given before,  locally on terminal  that is type "python app.py"</p>
+            </form>
+        </div>
+
+        <div id="projects" class="section-content">
+            <h2>Projects</h2>
+            <form>
+            <p>1. Job Portal with AI Resume Matching
+                Description: A job portal where job seekers upload resumes and employers post job listings. The portal uses AI to match candidates to suitable job roles based on skills and experience.
+                Technologies: Python (Flask/Django), HTML, CSS, JavaScript, OpenAI API.
+                Key Features: Resume parsing, skill matching, and job recommendations.</p>
+            <p>2. Fitness Tracking App with AI Suggestions
+                Description: A fitness app that tracks daily activities, monitors calories, and provides AI-driven workout suggestions.
+                Technologies: Kotlin, TensorFlow Lite, Firebase.
+                Key Features: Activity tracking, AI workout plans, and progress reports.</p>
+            <p>3. Chatbot for Healthcare Assistance
+                Description: An AI chatbot that provides basic healthcare advice, medicine dosage suggestions, and doctor appointment booking.
+                Technologies: Python (Flask), ChatGPT API, Twilio API.
+                Key Features: Symptom analysis, medical recommendations, and real-time chat.</p>
+        </form>
+        </div>
+
+        <div id="achievements" class="section-content">
+            <h2>Achievements</h2>
+            <form>
+            <p>Top Scorer in Computer Science: Secured first place in the computer science department for two consecutive semesters.</p>
+            <p> Technical Paper Presentation Winner: Won first place in a national-level technical symposium for presenting a paper on Generative AI in Cybersecurity.</p>
+            <p> Academic Excellence Award: Received the Best Student Award for outstanding performance in academics and technical projects..</p>
+            </form>        
+            </div>
+
+        <div id="contact" class="section-content">
+            <h2>Contact</h2>
+            <form>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br><br>
+                <label for="message">Message:</label><br>
+                <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <button class="lamp-button" onclick="toggleLamp()">Turn On Lamp🕯️ </button>
+        
+    </div>
+
+    <!-- Analog Clock -->
+    <div id="clock">
+        <div class="hour"></div>
+        <div class="minute"></div>
+        <div class="second"></div>
+        <div class="numbers">
+            <div class="twelve">12</div>
+            <div class="one">1</div>
+            <div class="two">2</div>
+            <div class="three">3</div>
+            <div class="four">4</div>
+            <div class="five">5</div>
+            <div class="six">6</div>
+            <div class="seven">7</div>
+            <div class="eight">8</div>
+            <div class="nine">9</div>
+            <div class="ten">10</div>
+            <div class="eleven">11</div>
+        </div>
+    </div>
+
+    <!-- Sudoku Game Section -->
+    
+    <div class="sudoku-container" id="sudokuBoard">
+        <!-- Sudoku grid will be generated here -->
+    </div>
+
+    <!-- Add Audio files -->
+    <audio id="introAudio" src="intro.mp3" preload="auto"></audio>
+    <audio id="projectsAudio" src="work.mp3" preload="auto"></audio>
+    <audio id="achievementsAudio" src="achieve.mp3" preload="auto"></audio>
+    <audio id="contactAudio" src="contact.mp3" preload="auto"></audio>
+    
+    <div class="radio-player">
+        <div class="speaker"></div> <!-- Speaker design -->
+        <h1>Retro Radio</h1>
+        <audio id="audio-player"></audio>
+        <div class="controls">
+            <button id="play-button">Play</button>
+            <button id="pause-button">Pause</button>
+            <button id="next-button">Next</button>
+        </div>
+        <div class="track-info">
+            <p>Now Playing->: <span id="current-track">Track 1 - Chill Vibes</span></p>
+        </div>
+        <div class="speaker"></div> <!-- Speaker design -->
+    </div>
+
+  
+    <div class="news-ticker" id="news-ticker">
+        <span>Breaking News India vs Australia 3rd Test Day 2 Hourly Weather Report: Brisbane Under 'Alert'. The Reason Is...</span>
+    </div>
+</div>
+
+<button class="open-gallery-button" onclick="openGallery()">Open 💪🏻🙌🏻</button>
+
+  <div class="gallery-modal" id="galleryModal">
+    <div class="gallery-modal-content">
+      <div class="gallery-header">
+        <h2>My Gallery</h2>
+        <button class="close-gallery" onclick="closeGallery()">✖</button>
+      </div>
+      <div class="gallery-items">
+        <div class="gallery-item">
+          <img src="ac1.jpg" alt="Retro Image 1">
+        </div>
+        <div class="gallery-item">
+          <video controls>
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="gallery-item">
+          <img src="ac2.jpg" alt="Retro Image 2">
+          
+        </div>
+        <div class="gallery-item">
+          <img src="ac3.jpg" alt="Retro Image 3">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Cartoon Images Section -->
+<div class="cartoon-images" style="position: absolute; top: 840px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+    <div style="text-align: center;">
+        <img src="cartoon1.gif" alt="Cartoon 1" style="width: 220px; height: auto;">
+       
+    </div>
+    <div style="text-align: center;">
+        <img src="cartoon2.gif" alt="Cartoon 2" style="width: 220px; height: auto;">
+       
+    </div>
+    <div style="text-align: center;">
+        <img src="cartoon3.gif" alt="Cartoon 3" style="width: 220px; height: auto;">
+        
+    </div>
+    <div style="text-align: center;">
+        <img src="cartoon4.gif" alt="Cartoon 4" style="width: 220px; height: auto;">
+        
+    </div>
+</div>
+
+<div id="splash-screen">
+    <h1>Welcome to My Portfolio</h1>
+    <p>In this website you can control mouse controls using hand gestures</p>
+    <p>To experience the amazing experience!! </p>
+    <p>Check out the instructions at https://github.com/shonology/AmazePort, please ensure you have downloaded and run the required Python script locally.</p>
+    <p>Click the button below to download the script:</p>
+    <a href="app.py" download>Download Python File</a>
+    <button onclick="continueToWebsite()">Continue to Website</button>
+</div>
+
+
+
+
+<script>
+function continueToWebsite() {
+            document.getElementById('splash-screen').style.display = 'none'; // Hide the splash screen
+            document.querySelector('.window').style.display = 'block'; // Show the main website content
+        }
+function openGallery() {
+      const modal = document.getElementById('galleryModal');
+      modal.style.display = 'block';
+    }
+
+    function closeGallery() {
+      const modal = document.getElementById('galleryModal');
+      modal.style.display = 'none';
+    }
+        
+window.onload = function() {
+    document.getElementById('termsModal').classList.add('visible');
+}
+
+function agreeTerms() {
+    document.getElementById('termsModal').classList.remove('visible');
+    showLoadingAnimation();
+}
+
+function animateSignature() {
+    const signature = document.getElementById('signature');
+    signature.style.display = 'inline-block'; // Make the signature visible
+
+    // Add class to trigger the path animation
+    setTimeout(() => {
+        signature.classList.add('visible');
+    }, 500); // Small delay before starting the animation
+}
+
+// Show loading animation after agreeing to terms
+function showLoadingAnimation() {
+    const loadingAnim = document.getElementById('loadingAnimation');
+    loadingAnim.classList.add('visible');
+    setTimeout(() => {
+        loadingAnim.classList.remove('visible');
+        // Proceed to show the rest of the content
+        document.getElementById('overlay').classList.add('hidden-overlay');
+    }, 3000); // Duration for the loading animation (3 seconds)
+}
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const isDisplayed = section.style.display === 'block';
+
+    // Hide all sections
+    const sections = document.querySelectorAll('.section-content');
+    sections.forEach(sec => sec.style.display = 'none');
+
+    // Toggle the clicked section
+    section.style.display = isDisplayed ? 'none' : 'block';
+}
+
+
+function toggleLamp() {
+    const overlay = document.getElementById('overlay');
+    const title = document.getElementById('title');
+    const headline = document.getElementById('headline');
+    const bodyText = document.getElementById('bodyText');
+
+    if (overlay.classList.contains('hidden-overlay')) {
+        overlay.classList.remove('hidden-overlay');
+        title.style.color = '#f8f8f8';
+        headline.style.color = '#fff';
+        bodyText.classList.remove('visible');
+    } else {
+        overlay.classList.add('hidden-overlay');
+        title.style.color = '#ffd700';
+        headline.style.color = '#ffd700';
+        bodyText.classList.add('visible');
+    }
+}
+
+// Sudoku Game Logic
+const sudokuBoard = document.getElementById('sudokuBoard');
+
+    // Predefined Sudoku puzzle with 0 representing empty cells
+    const predefinedSudoku = [
+        5, 3, 0, 0, 7, 0, 0, 0, 0,
+        6, 0, 0, 1, 9, 5, 0, 0, 0,
+        0, 9, 8, 0, 0, 0, 0, 6, 0,
+        8, 0, 0, 0, 6, 0, 0, 0, 3,
+        4, 0, 0, 8, 0, 3, 0, 0, 1,
+        7, 0, 0, 0, 2, 0, 0, 0, 6,
+        0, 6, 0, 0, 0, 0, 2, 8, 0,
+        0, 0, 0, 4, 1, 9, 0, 0, 5,
+        0, 0, 0, 0, 8, 0, 0, 7, 9
+    ];
+
+    const createSudokuGrid = () => {
+        for (let i = 0; i < 81; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('sudoku-cell');
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '1';
+            input.max = '9';
+            input.maxLength = '1';
+            
+            // If the predefined value is not 0, set it and disable editing
+            if (predefinedSudoku[i] !== 0) {
+                input.value = predefinedSudoku[i];
+                input.disabled = true; // Prevent editing of predefined values
+                input.classList.add('predefined-cell'); // Optional: Add styling for predefined cells
+            }
+            
+            cell.appendChild(input);
+            sudokuBoard.appendChild(cell);
+        }
+    };
+
+    createSudokuGrid(); // Create the Sudoku grid
+
+// Analog Clock Logic
+const hourHand = document.querySelector('#clock .hour');
+const minuteHand = document.querySelector('#clock .minute');
+const secondHand = document.querySelector('#clock .second');
+
+function updateClock() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    const hourDeg = (hours % 12) * 30 + (minutes / 60) * 30; // 30 degrees per hour
+    const minuteDeg = minutes * 6 + (seconds / 60) * 6; // 6 degrees per minute
+    const secondDeg = seconds * 6; // 6 degrees per second
+
+    hourHand.style.transform = `rotate(${hourDeg}deg)`;
+    minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
+    secondHand.style.transform = `rotate(${secondDeg}deg)`;
+}
+
+// Play Sound Function
+function playSound(section) {
+    const audioMap = {
+        'introduction': document.getElementById('introAudio'),
+        'projects': document.getElementById('projectsAudio'),
+        'achievements': document.getElementById('achievementsAudio'),
+        'contact': document.getElementById('contactAudio')
+    };
+
+    // Stop any currently playing sound before playing the selected one
+    Object.values(audioMap).forEach(audio => audio.pause());
+
+    const audio = audioMap[section];
+    if (audio) {
+        audio.currentTime = 0;  // Rewind to the start
+        audio.play();
+    }
+}
+
+const playlist = [
+            { name: "Track 1 - Chill Vibes", src: "music1.mp3" },
+            { name: "Track 2 - Perfect Stranger", src: "music2.mp3" },
+            { name: "Track 3 - Electro lofi", src:"music3.mp3" },
+            { name: "Track 4 - Retro Electro Beat", src:"music4.mp3" },
+            { name: "Track 5 - Jazz", src:"music5.mp3" },
+            { name: "Track 6 - Low Beat", src:"music6.mp3" },
+            { name: "Track 7 - Hiphop", src:"music7.mp3" },
+            { name: "Track 8 - Nostalgia", src:"music8.mp3" }
+        ];
+
+        let currentTrackIndex = 0; // Index of the current track
+
+        // DOM Elements
+        const audioPlayer = document.getElementById('audio-player');
+        const playButton = document.getElementById('play-button');
+        const pauseButton = document.getElementById('pause-button');
+        const nextButton = document.getElementById('next-button');
+        const currentTrackName = document.getElementById('current-track');
+
+        // Initialize the player with the first track
+        function loadTrack(index) {
+            audioPlayer.src = playlist[index].src;
+            currentTrackName.textContent = playlist[index].name;
+        }
+        loadTrack(currentTrackIndex);
+
+        // Play Button
+        playButton.addEventListener('click', () => {
+            audioPlayer.play();
+        });
+
+        // Pause Button
+        pauseButton.addEventListener('click', () => {
+            audioPlayer.pause();
+        });
+
+        // Next Button
+        nextButton.addEventListener('click', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length; // Loop back to the first track
+            loadTrack(currentTrackIndex);
+            audioPlayer.play();
+        });
+
+        
+// Start the clock immediately and set interval for continuous update
+setInterval(updateClock, 1000);
+updateClock(); // Initial call to set the clock immediately
+fetchNews();
+
+</script>
+</body>
+</html>
