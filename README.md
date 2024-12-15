@@ -6,7 +6,7 @@ This project demonstrates a computer vision-based hand gesture control system th
 ---
 
 ## Features
-- **Mouse Movement**: Move your hand to control the mouse pointer  if left move palm left if right move right.
+- **Mouse Movement**: Move your hand to control the mouse pointer . If you want to move left move palm left and to move right move palm right..
 - **Click**: Curl all fingers into a fist to perform a left-click.
 - **Scroll Up**: Point with your index finger.
 - **Scroll Down**: Point with your thumb.
