@@ -30,7 +30,7 @@ Ensure you have the following dependencies installed on your system before runni
 
 ### 1. Clone the Repository
 ```bash
-$ [git clone https://github.com/yourusername/tesla-hand-gesture-control.git](https://github.com/shonology/AmazePort.git)
+$ [https://github.com/shonology/AmazePort.git]
 $ cd AmazePort
 ```
 
